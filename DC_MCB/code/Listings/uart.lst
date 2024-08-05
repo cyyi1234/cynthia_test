@@ -1,0 +1,123 @@
+C51 COMPILER V9.60.7.0   UART                                                              08/01/2024 18:42:10 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN .\output\uart.obj
+COMPILER INVOKED BY: C:\Users\CNCYCUI\OneDrive - ABB\Keil_v5\C51\BIN\C51.EXE source\uart.c OPTIMIZE(8,SPEED) BROWSE DEBU
+                    -G OBJECTEXTEND PRINT(.\Listings\uart.lst) TABS(2) OBJECT(.\output\uart.obj)
+
+line level    source
+
+   1          #include "uart.h"
+   2          
+   3          unsigned char *pchar;                      
+   4          
+   5          // timer0 internel time=11.0592Mhz
+   6          void delay_1ms(unsigned int ms) {
+   7   1          unsigned int i;
+   8   1          
+   9   1          // init timer0
+  10   1          TMOD &= 0xF0;      // clear timer0 mode
+  11   1          TMOD |= 0x01;      // set timer0 to 16-bit timer mode
+  12   1          
+  13   1          for (i = 0; i < ms; i++) {
+  14   2              TH0 = 0xFC;    // high bit for init value
+  15   2              TL0 = 0x18;    // low bit for init value
+  16   2              
+  17   2              TR0 = 1;       // start timer0
+  18   2              while (TF0 == 0); // waiting for overflow
+  19   2              TF0 = 0;       // Clear overflow flags
+  20   2              TR0 = 0;       // stop timer0
+  21   2          }
+  22   1      }
+  23          
+  24          #if 0
+              void delay_100us(unsigned int us) {
+                  unsigned int i;
+                  
+                  TMOD &= 0xF0;      
+                  TMOD |= 0x01; 
+                  for (i = 0; i < us; i++)
+                  {
+                    TH0 = 0xFF;    
+                    TL0 = 0x9C;   
+                      
+                    TR0 = 1;       
+                    while (TF0 == 0); 
+                    TF0 = 0;       
+                    TR0 = 0;  
+                  }
+                }
+              #endif
+  42            
+  43          void Uart_Init(void)    //9600bps@11.0592MHz
+  44          {
+  45   1        SCON = 0x50;    //8bit and variable baudrate, mode 1
+  46   1        T2L = (65536 - (FOSC/4/BAUD));      //Initial timer value
+  47   1        T2H = (65536 - (FOSC/4/BAUD))>>8;   //Set reload value
+  48   1        AUXR = 0x14;    //Timer2 running 1 machine cycle is 1 clock cycle, start T2
+  49   1        AUXR |= 0x01;   //T2 for UART1
+  50   1        ES=1;     //uart1 enable interrupt
+  51   1        REN=1;    //uart can receive data
+  52   1        
+  53   1        TI=1;
+  54   1        
+C51 COMPILER V9.60.7.0   UART                                                              08/01/2024 18:42:10 PAGE 2   
+
+  55   1      }
+  56          
+  57          void Uart_SendByte(unsigned char sbyte)
+  58          {  
+  59   1           SBUF=sbyte;  //write data into SBUF register       
+  60   1           while(!TI);          
+  61   1           TI=0;            //clear sent flag 
+  62   1      }
+  63          
+  64          //mapping printf
+  65          char putchar(char c)
+  66          {
+  67   1        Uart_SendByte((unsigned char)c);
+  68   1        return c;
+  69   1      }
+  70          
+  71          #if 0
+              void Uart_SendString(unsigned char *pstr)
+              {
+                   while(*pstr!='\0')       
+                   {
+                       Uart_SendByte(*pstr);      
+                       pstr++;          
+                   } 
+              }
+              
+              void Uart() interrupt 4 
+              { 
+                //rev interrupt flag
+                if(RI)
+                {
+                  RI = 0; //clear RI
+                  //*pchar = SBUF;
+                  //Uart_SendByte(*pchar); //send the rev_data
+                  Uart_SendByte(SBUF); //send the rev_data
+                }
+                //send interrupt flag
+                if(TI)
+                {
+                  TI = 0;  //clear TI bit
+                }   
+              }
+              #endif
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     74    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

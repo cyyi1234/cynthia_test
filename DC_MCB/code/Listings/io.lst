@@ -1,0 +1,62 @@
+C51 COMPILER V9.60.7.0   IO                                                                08/01/2024 18:42:10 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE IO
+OBJECT MODULE PLACED IN .\output\io.obj
+COMPILER INVOKED BY: C:\Users\CNCYCUI\OneDrive - ABB\Keil_v5\C51\BIN\C51.EXE source\io.c OPTIMIZE(8,SPEED) BROWSE DEBUG 
+                    -OBJECTEXTEND PRINT(.\Listings\io.lst) TABS(2) OBJECT(.\output\io.obj)
+
+line level    source
+
+   1          #include "io.h"
+   2          
+   3          //set p1.3 p1.4 p3.3 p3.2 push-pull mode
+   4          void IO_Init(void)
+   5          {
+   6   1          P1M0 |= 0x18; P1M1 &= ~0x18;    
+   7   1          P3M0 |= 0x0c; P3M1 &= ~0x0c;  
+   8   1          P33=0;
+   9   1          P32=0;
+  10   1      }
+  11          
+  12          //turn on p1.5 p5.5 
+  13          void Led_On()
+  14          {
+  15   1        P15=0;
+  16   1        P55=0;
+  17   1      }
+  18          
+  19          #if 0
+              //turn on p1.5 p5.5 
+              void Led_Off()
+              {
+                P15=0;
+                P55=0;
+              }
+              #endif
+  27          
+  28          void Set_LGBT_High()
+  29          {
+  30   1        P13=1;
+  31   1        P14=1;
+  32   1      }
+  33          
+  34          void Set_LGBT_Low()
+  35          {
+  36   1        P13=0;
+  37   1        P14=0;
+  38   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     32    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
